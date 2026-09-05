@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="GCIcdzAHlSr4FI8K1yxiGb">
+<head data-page-node-id="GxJp0e3jTVmDJEoeLDHT2a">
+<meta charset="UTF-8" data-page-node-id="dKEZmB9CiVmI06UcntZDiZ" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="LEeuHWPPn2MN0lp9BLplSZ" />
+<title>读书笔记工作台 · Reading Notes Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="xi5zrOjjqiI11PSZd0Bch5" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="bUl9oZLvxMdjpBN9ahzRG0" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" data-page-node-id="1G1FVEECHnaGTIdpZBOVBY" />
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#faf5e9;
+    --paper-3:#fffdf7;
+    --ink:#2c2519;
+    --ink-soft:#5b5141;
+    --ink-faint:#8a7f68;
+    --line:#ddd1b6;
+    --line-soft:#e9e0cb;
+    --accent:#a8442a;
+    --accent-2:#7c6f4d;
+    --shadow:0 18px 40px -22px rgba(60,45,20,.45);
+    --shadow-sm:0 6px 18px -12px rgba(60,45,20,.4);
+    --serif:"Noto Serif SC","Songti SC","STSong",Georgia,"Times New Roman",serif;
+    --sans:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #f7f0df 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #efe6d0 0%, transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* subtle paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/></svg>");
+  }
+  .app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+  a{color:var(--accent);}
+
+  /* ---------- Top App Bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    display:flex;align-items:center;gap:14px;
+    padding:12px clamp(14px,4vw,40px);
+    background:rgba(250,245,233,.82);
+    backdrop-filter:saturate(140%) blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px;font-family:var(--serif);font-size:18px;color:var(--ink);}
+  .brand .logo{
+    width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:linear-gradient(160deg,var(--accent),#7a2f1d);color:#fff;font-size:18px;box-shadow:var(--shadow-sm);
+  }
+  .nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
+  .nav button{
+    font-family:var(--sans);font-size:14px;font-weight:500;
+    border:1px solid transparent;background:transparent;color:var(--ink-soft);
+    padding:8px 14px;border-radius:999px;cursor:pointer;transition:.18s;
+  }
+  .nav button:hover{background:var(--line-soft);color:var(--ink);}
+  .nav button.active{background:var(--ink);color:#faf5e9;border-color:var(--ink);}
+
+  .view{display:none;flex:1;}
+  .view.active{display:block;}
+
+  /* ---------- Library View ---------- */
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(18px,4vw,40px);}
+  .lib-head{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:8px;}
+  .lib-head h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,4vw,36px);margin:0;letter-spacing:.5px;}
+  .lib-sub{color:var(--ink-faint);font-family:var(--sans);font-size:14px;margin:4px 0 0;}
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin:22px 0 26px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-3);box-shadow:var(--shadow-sm);
+  }
+  .toolbar .search{flex:1;min-width:200px;position:relative;}
+  .toolbar .search input{
+    width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);border-radius:10px;
+    background:var(--paper);font-family:var(--sans);font-size:14px;color:var(--ink);
+  }
+  .toolbar .search::before{content:"🔍";position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.6;font-size:14px;}
+  .toolbar select{
+    padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);
+    font-family:var(--sans);font-size:14px;color:var(--ink);cursor:pointer;
+  }
+  .toolbar .count{font-family:var(--sans);font-size:13px;color:var(--ink-faint);margin-left:auto;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;}
+  .book-card{
+    position:relative;background:var(--paper-3);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;
+  }
+  .book-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+  .book-card .spine{height:8px;width:100%;}
+  .book-card .bc-body{padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .book-card .bc-title{font-family:var(--serif);font-weight:700;font-size:19px;line-height:1.4;color:var(--ink);}
+  .book-card .bc-author{font-family:var(--sans);font-size:13px;color:var(--ink-soft);}
+  .book-card .bc-oneliner{font-size:14px;color:var(--ink-soft);line-height:1.6;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .book-card .bc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px;}
+  .tag{font-family:var(--sans);font-size:11.5px;padding:3px 9px;border-radius:999px;
+    background:var(--line-soft);color:var(--ink-soft);border:1px solid var(--line);}
+  .tag.date{background:transparent;border-color:var(--line);}
+  .empty{text-align:center;color:var(--ink-faint);font-family:var(--sans);padding:60px 20px;}
+
+  /* ---------- Note (Reading) View ---------- */
+  .note-scroll{background:var(--paper);}
+  .note{max-width:900px;margin:0 auto;background:var(--paper-2);
+    border-left:1px solid var(--line);border-right:1px solid var(--line);
+    box-shadow:var(--shadow);min-height:100vh;}
+  .hero{position:relative;min-height:46vh;display:flex;align-items:flex-end;overflow:hidden;
+    background:linear-gradient(160deg,#3a2c1c,#1c140c);}
+  .hero .photo{position:absolute;inset:0;background-size:cover;background-position:center;
+    background-image:url("https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80");}
+  .hero .mask{position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(20,14,8,.15) 0%,rgba(20,14,8,.35) 40%,rgba(20,14,8,.85) 100%);}
+  .hero .hero-inner{position:relative;z-index:2;padding:clamp(22px,5vw,52px);color:#f6efdd;width:100%;}
+  .hero .eyebrow{font-family:var(--sans);font-size:13px;letter-spacing:3px;text-transform:uppercase;
+    opacity:.85;margin-bottom:10px;}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(30px,6vw,52px);margin:0;line-height:1.15;
+    text-shadow:0 2px 18px rgba(0,0,0,.5);}
+  .hero .byline{font-family:var(--sans);font-size:15px;opacity:.92;margin-top:10px;}
+  .hero .oneliner{font-family:var(--serif);font-size:clamp(15px,2.4vw,19px);margin-top:16px;max-width:640px;
+    border-left:3px solid rgba(246,239,221,.6);padding-left:14px;font-style:italic;opacity:.95;}
+
+  .note-body{padding:clamp(22px,5vw,52px);position:relative;}
+  /* bookmark ribbon */
+  .ribbon{position:absolute;top:0;right:28px;width:42px;height:78px;z-index:5;
+    background:var(--accent);box-shadow:var(--shadow-sm);}
+  .ribbon::after{content:"";position:absolute;left:0;bottom:-12px;border-left:21px solid var(--accent);
+    border-right:21px solid var(--accent);border-bottom:12px solid transparent;}
+
+  .sec{margin:0 0 clamp(34px,6vw,56px);}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;}
+  .sec-num{font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:2px;color:var(--accent);
+    border:1px solid var(--accent);border-radius:6px;padding:3px 9px;}
+  .sec-title{font-family:var(--serif);font-weight:700;font-size:clamp(21px,3.4vw,27px);margin:0;color:var(--ink);}
+  .sec-sub{font-family:var(--sans);font-size:13px;color:var(--ink-faint);margin-left:auto;}
+
+  /* info grid */
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+  .info-cell{background:var(--paper-3);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .info-cell .k{font-family:var(--sans);font-size:12px;letter-spacing:1px;color:var(--ink-faint);text-transform:uppercase;}
+  .info-cell .v{font-family:var(--serif);font-size:16px;font-weight:600;margin-top:5px;color:var(--ink);line-height:1.5;}
+  .info-cell.full{grid-column:1/-1;}
+  .lead{font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink-soft);
+    background:linear-gradient(180deg,var(--paper-3),var(--paper-2));border:1px solid var(--line);
+    border-left:4px solid var(--accent-2);border-radius:12px;padding:18px 20px;margin-top:16px;}
+
+  /* dual system */
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .sys{border-radius:14px;padding:20px;border:1px solid var(--line);position:relative;overflow:hidden;}
+  .sys.s1{background:linear-gradient(165deg,#fbeede,#f6e7cf);}
+  .sys.s2{background:linear-gradient(165deg,#e9eef0,#dde7ea);}
+  .sys .sys-tag{font-family:var(--sans);font-size:12px;letter-spacing:2px;font-weight:700;color:var(--accent);}
+  .sys h3{font-family:var(--serif);font-size:22px;margin:6px 0 4px;}
+  .sys .sys-quote{font-family:var(--serif);font-style:italic;color:var(--ink-soft);font-size:14px;margin-bottom:12px;}
+  .sys ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-soft);}
+  .sys ul li{margin:5px 0;}
+  .sys .badge{display:inline-block;margin-top:12px;font-family:var(--sans);font-size:12px;font-weight:700;
+    padding:5px 11px;border-radius:999px;background:rgba(0,0,0,.06);color:var(--ink);}
+  .insight{margin-top:18px;background:var(--paper-3);border:1px dashed var(--accent);border-radius:12px;
+    padding:16px 18px;font-family:var(--serif);font-size:15.5px;color:var(--ink);}
+  .insight b{color:var(--accent);}
+
+  /* bias cards */
+  .bias-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;}
+  .bias{background:var(--paper-3);border:1px solid var(--line);border-radius:13px;padding:16px 17px;
+    border-top:4px solid var(--accent-2);transition:.18s;}
+  .bias:hover{box-shadow:var(--shadow-sm);transform:translateY(-2px);}
+  .bias h4{font-family:var(--serif);font-size:18px;margin:0 0 2px;color:var(--ink);}
+  .bias .en{font-family:var(--sans);font-size:11.5px;letter-spacing:1px;color:var(--ink-faint);text-transform:uppercase;}
+  .bias p{font-size:14px;color:var(--ink-soft);margin:9px 0 0;line-height:1.65;}
+  .bias .ex{margin-top:10px;font-size:13px;color:var(--ink);background:var(--line-soft);border-radius:8px;padding:8px 10px;}
+  .bias .ex b{color:var(--accent);}
+
+  /* chapters timeline */
+  .timeline{position:relative;margin-left:8px;padding-left:26px;border-left:2px solid var(--line);}
+  .tl-item{position:relative;padding:0 0 22px;}
+  .tl-item::before{content:attr(data-n);position:absolute;left:-44px;top:0;width:34px;height:34px;border-radius:50%;
+    background:var(--accent);color:#fff;font-family:var(--serif);font-weight:700;display:grid;place-items:center;font-size:15px;
+    box-shadow:var(--shadow-sm);}
+  .tl-item h4{font-family:var(--serif);font-size:19px;margin:2px 0 3px;color:var(--ink);}
+  .tl-item .tl-note{font-family:var(--sans);font-size:13px;color:var(--ink-faint);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+  .tl-item p{font-size:14.5px;color:var(--ink-soft);margin:0;line-height:1.65;}
+
+  /* quotes */
+  .quote{border-left:5px solid var(--accent-2);background:var(--paper-3);border-radius:0 12px 12px 0;
+    padding:18px 22px;margin-bottom:16px;position:relative;}
+  .quote .mark{font-family:var(--serif);font-size:46px;line-height:.6;color:var(--accent);opacity:.35;}
+  .quote .qt{font-family:var(--serif);font-size:18px;line-height:1.85;color:var(--ink);margin:4px 0 8px;}
+  .quote .src{font-family:var(--sans);font-size:13px;color:var(--ink-faint);text-align:right;}
+
+  /* actions */
+  .acts{counter-reset:act;display:grid;gap:14px;}
+  .act{display:flex;gap:14px;align-items:flex-start;background:var(--paper-3);border:1px solid var(--line);
+    border-radius:12px;padding:14px 16px;}
+  .act::before{counter-increment:act;content:counter(act);flex:0 0 auto;width:30px;height:30px;border-radius:50%;
+    background:var(--accent);color:#fff;font-family:var(--serif);font-weight:700;display:grid;place-items:center;font-size:15px;}
+  .act h4{font-family:var(--serif);font-size:16.5px;margin:2px 0 3px;color:var(--ink);}
+  .act p{font-size:14px;color:var(--ink-soft);margin:0;line-height:1.6;}
+
+  /* audience */
+  .aud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+  .aud{background:var(--paper-3);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .aud h4{font-family:var(--serif);font-size:17px;margin:0 0 6px;color:var(--ink);}
+  .aud p{font-size:14px;color:var(--ink-soft);margin:0;line-height:1.6;}
+
+  .note-foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .note-foot .meta{font-family:var(--sans);font-size:13px;color:var(--ink-faint);margin-right:auto;}
+  .btn{font-family:var(--sans);font-size:14px;font-weight:500;border:1px solid var(--line);background:var(--paper-3);
+    color:var(--ink);padding:9px 16px;border-radius:10px;cursor:pointer;transition:.18s;}
+  .btn:hover{background:var(--line-soft);}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn.primary:hover{background:#8f3823;}
+  .btn.ghost{background:transparent;}
+
+  /* ---------- Editor ---------- */
+  .editor{max-width:880px;margin:0 auto;}
+  .form-grid{display:grid;gap:16px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .field .hint{font-family:var(--sans);font-size:11.5px;color:var(--ink-faint);font-weight:400;}
+  .field input,.field textarea,.field select{
+    font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper-3);
+    border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;}
+  .field textarea{resize:vertical;min-height:64px;line-height:1.6;}
+  .field.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .card-block{border:1px solid var(--line);border-radius:12px;background:var(--paper-3);padding:16px;margin-bottom:16px;}
+  .card-block > .cb-title{font-family:var(--serif);font-weight:700;font-size:17px;margin:0 0 12px;color:var(--ink);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .dy-item{border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:12px;background:var(--paper-2);position:relative;}
+  .dy-item .del{position:absolute;top:8px;right:10px;font-family:var(--sans);font-size:12px;color:var(--accent);
+    background:none;border:none;cursor:pointer;}
+  .dy-row{display:grid;gap:10px;}
+  .add-btn{font-family:var(--sans);font-size:13px;color:var(--accent);background:var(--paper-2);border:1px dashed var(--accent);
+    border-radius:9px;padding:8px 12px;cursor:pointer;width:100%;}
+  .add-btn:hover{background:var(--line-soft);}
+  .import-note{font-family:var(--sans);font-size:13px;background:#eef4ee;border:1px solid #cfe0cf;color:#3c5a3c;
+    border-radius:10px;padding:10px 12px;margin-bottom:14px;display:none;}
+  .editor-actions{display:flex;gap:10px;justify-content:flex-end;margin:20px 0 40px;flex-wrap:wrap;}
+
+  /* ---------- Data / Sharing ---------- */
+  .panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-3);padding:20px;margin-bottom:18px;}
+  .panel h3{font-family:var(--serif);font-size:20px;margin:0 0 6px;}
+  .panel p{font-family:var(--sans);font-size:14px;color:var(--ink-soft);line-height:1.7;margin:6px 0;}
+  .panel .steps{font-family:var(--sans);font-size:13.5px;color:var(--ink-soft);padding-left:18px;line-height:1.8;}
+  .switch{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:13px;color:var(--ink-soft);cursor:pointer;}
+  .switch input{width:16px;height:16px;}
+
+  @media (max-width:680px){
+    .dual{grid-template-columns:1fr;}
+    .field.row2{grid-template-columns:1fr;}
+    .ribbon{right:16px;}
+    .hero{min-height:40vh;}
+    .nav button{padding:7px 11px;font-size:13px;}
+    .brand .label{display:none;}
+  }
+</style>
+</head>
+<body data-page-node-id="XUAuaN5cBk77kcVyROS6dR">
+<div class="app" data-page-node-id="DIu0AnQinPlfSlSK7j4S6v">
+  <header class="topbar" data-page-node-id="a37cIA74PGz6mEFB1Fpfba">
+    <div class="brand" data-page-node-id="gKngY8x4R3OL20gRkYaIEc"><span class="logo" data-page-node-id="NPtWI9nv1XvbMysL5uSCx1">📚</span><span class="label" data-page-node-id="s8ttMiD9z5g2hfnQuJ5ItU">读书笔记工作台</span></div>
+    <nav class="nav" data-page-node-id="dAstFlTGcqArQRP5j5u1jL">
+      <button data-view="library" class="active" data-page-node-id="3xx45t7FS1jRCBhjYHKbk7">书库</button>
+      <button data-view="editor" data-page-node-id="36WFG7p6j0TW2tZpbgi7re">写笔记</button>
+      <button data-view="data" data-page-node-id="NcAV83jSToKPAV8ox6LtSB">数据 / 共享</button>
+    </nav>
+  </header>
+
+  <!-- ============ LIBRARY ============ -->
+  <section class="view active" id="view-library" data-page-node-id="hYx9AYyRV20LG8Ciqte4Go">
+    <div class="wrap" data-page-node-id="DvwXgMxUxAiCqXkDv7J51a">
+      <div class="lib-head" data-page-node-id="xfCJQbhfGDvU0E9ANPWyS1">
+        <div data-page-node-id="2MFiGHZB5nEWqKzfaWYXHF">
+          <h1 data-page-node-id="X9Cw8Z8ZdPce5lbtGaaCod">我的书库</h1>
+          <p class="lib-sub" data-page-node-id="A2Bzo0B61iz3RRF4gG7D6I">按框架沉淀每一本书的精读笔记 · 支持检索与团体共用</p>
+        </div>
+      </div>
+      <div class="toolbar" data-page-node-id="w8urOARo77udvnBk7K0Gj0">
+        <div class="search" data-page-node-id="rgCWO4hj4lZRdzQxTSOZSG"><input id="searchInput" type="text" placeholder="搜索书名 / 作者 / 领域 / 关键词…" data-page-node-id="CGpxk158omfJWuQ5xqt6vS" /></div>
+        <select id="filterTheme" data-page-node-id="FRcVXt1braKF55jPuPIiP6"><option value="" data-page-node-id="JovIwI6oSps0cKWwilvYAe">全部主题</option></select>
+        <select id="filterYear" data-page-node-id="vbg7BNMiIU5QzRAoY8BbS6"><option value="" data-page-node-id="MWdyOjpuByyuC2gsXMyoxI">全部年份</option></select>
+        <select id="sortBy" data-page-node-id="7EM81c1LMbtBB9ahM8qI6I">
+          <option value="date_desc" data-page-node-id="KgMNDadeAkIIsJCWgL80so">日期（新→旧）</option>
+          <option value="date_asc" data-page-node-id="6npHzxnjNQxX7VHrKx2KvB">日期（旧→新）</option>
+          <option value="title" data-page-node-id="ss4idBOCQdjsE20q7yzrsQ">书名（A→Z）</option>
+        </select>
+        <span class="count" id="libCount" data-page-node-id="EuIsmc82TxMdlgQ2m8IazD"></span>
+      </div>
+      <div class="grid" id="bookGrid" data-page-node-id="cpCzDjvGdQZAnpBqhXRFjb"></div>
+    </div>
+  </section>
+
+  <!-- ============ NOTE / READING ============ -->
+  <section class="view note-scroll" id="view-note" data-page-node-id="YQ58hQLRopmYyDEo23XwTo">
+    <article class="note" id="noteRoot" data-page-node-id="FhLBkidvYzvUyoq5vg8jX8"></article>
+  </section>
+
+  <!-- ============ EDITOR ============ -->
+  <section class="view" id="view-editor" data-page-node-id="pX27D7Wv5qP7898CrUI54Q">
+    <div class="wrap editor" data-page-node-id="rLHeyMmYj2kbKOcay5CXsr">
+      <h1 style="font-family:var(--serif);font-size:clamp(24px,4vw,32px);margin:0 0 4px;" data-page-node-id="pVOcWsmstQAvVFdA9yfAU0">写 / 编辑读书笔记</h1>
+      <p class="lib-sub" style="margin-bottom:18px;" data-page-node-id="axwe6ciUaQDz5CGDAj6FZt">按统一框架录入，或直接上传电子文件自动识别书名、作者与章节脉络。</p>
+      <div class="import-note" id="importNote" data-page-node-id="4vdTnRVvmb5sFHCUVCImz4"></div>
+
+      <div class="card-block" data-page-node-id="k9qn0lq8mcIeDP6DCZDDev">
+        <div class="cb-title" data-page-node-id="NvOQPHHmNe1cB9OPOGHEHQ">① 基础信息
+          <label class="switch" style="font-weight:400;font-size:12px;" data-page-node-id="F0CgRqigWA2Du1zI3h3E6U">📎 上传文件自动填充（支持 txt/md/html/Word/PDF）
+            <input type="file" id="fileInput" accept=".txt,.md,.markdown,.html,.htm,.docx,.pdf" data-page-node-id="KwngimTHzvw0htVFWHgEEt" />
+          </label>
+        </div>
+        <div style="font-family:var(--sans);font-size:12px;color:var(--ink-faint);margin:-4px 0 12px;line-height:1.6;">
+          扫描版 / 图片型 PDF 会自动走 OCR 识别（需联网下载中文模型，首次较慢）。长文档建议在手机扫描软件里只导出重点章节的少数页再上传，更快更准。
+        </div>
+        <div class="form-grid" data-page-node-id="Cf3YU3n7kmL6d3TBSkPWL3">
+          <div class="field" data-page-node-id="C5a58cWDyPb04Jczz39e0V"><label data-page-node-id="ngeCZBdOE9WulTTpbjrrG3">书名 *</label><input id="f_title" placeholder="例如：《思考，快与慢》" data-page-node-id="dabX3NvrqmJPSNv7ZBtIOa" /></div>
+          <div class="field row2" data-page-node-id="KwS8bSe2CgHhfhDip2qM5T">
+            <div data-page-node-id="GeQET33u0n2jIUuWFWXUfw"><label data-page-node-id="fhEs3Dc8k9PSyQ7SW3ZBeE">作者 *</label><input id="f_author" placeholder="丹尼尔·卡尼曼" data-page-node-id="yQ4XdqsBzKoRsxlZdUXTD6" /></div>
+            <div data-page-node-id="kleDabiYUnDklZ3DBnLMmb"><label data-page-node-id="hCBRbemJuZ9YkMq8RB05I9">领域</label><input id="f_field" placeholder="认知心理学 / 行为经济学" data-page-node-id="sydn9AcaemTfleQmjKydml" /></div>
+          </div>
+          <div class="field" data-page-node-id="HcGxk28xg6Wic3XhORQnqS"><label data-page-node-id="0Ucf9EYq70vR00LgVDEBZW">核心命题</label><input id="f_core" placeholder="直觉判断的系统性偏差" data-page-node-id="47JBuoM9hR7Dm6fhFZmGvJ" /></div>
+          <div class="field" data-page-node-id="52t4OwACB5IaeF5RtERuKF"><label data-page-node-id="RNy8MqsdABKOSonjEzjz5x">一句话总览</label><textarea id="f_oneliner" placeholder="用一句话说清这本书解决什么问题…"></textarea></div>
+          <div class="field row2" data-page-node-id="YZX7fyLXZSzVGd6jGOYpyz">
+            <div data-page-node-id="oGnBR54Kf0wrN7LT5NlGdD"><label data-page-node-id="VwuCRPnRa5VnTsXxSQ3U4S">关键词（逗号分隔）</label><input id="f_keywords" placeholder="双系统, 偏误, 决策" data-page-node-id="HmxYwL4V93wTSMzjohfc4n" /></div>
+            <div data-page-node-id="5Z5KUt5PdJjrYhhEewvN38"><label data-page-node-id="5tbiYBlNsG1SrpK50dFNeb">主题 / 分类（逗号分隔，用于检索）</label><input id="f_theme" placeholder="认知科学, 管理" data-page-node-id="LW05EydwBpMoqPTHGo0GGk" /></div>
+          </div>
+          <div class="field row2" data-page-node-id="9sIlSwV1dL5KcFxkZG51PY">
+            <div data-page-node-id="ANRQOetsVotGsRElGYCJx9"><label data-page-node-id="sqSMPY7uS1GkTzYVMGfPCu">合著 / 理论伙伴（可选）</label><input id="f_collab" placeholder="阿莫斯·特沃斯基" data-page-node-id="QcwluZcmZ0CRjBenSeRDuc" /></div>
+            <div data-page-node-id="FRpFrTsSTc7jJCixZKH6j3"><label data-page-node-id="Sk182ZOdfUKXTGWlXA9A40">代表贡献（可选）</label><input id="f_contrib" placeholder="前景理论" data-page-node-id="jqhfpCQ5fIBC4dlzCCMwfU" /></div>
+          </div>
+          <div class="field row2" data-page-node-id="qs8G57fFhzJM6QbxNdGDBN">
+            <div data-page-node-id="ezdrifsLDp3fuERb3ypyYv"><label data-page-node-id="KFnBrNzlwSnzAQjGzCbjpC">日期（用于按日期查找）</label><input id="f_date" type="date" data-page-node-id="6DPAvkjNsEzOioidlrlu4O" /></div>
+            <div data-page-node-id="Kq9C931kNgVhaWLxYORvaw"><label data-page-node-id="kxIZWSWlUYNPudmHBloUlE">书签色带颜色</label><input id="f_color" type="color" value="#a8442a" style="height:42px;padding:4px;" data-page-node-id="9Or9JeSPTcLWVJqiR6k2D2" /></div>
+          </div>
+          <div class="field" data-page-node-id="NtOpW9PzQWxVA1UPOnHWJf"><label data-page-node-id="Dk36V8Ajq9SxzyOH6DsIAC">Hero 封面图 URL（可选，默认图书馆书架）</label><input id="f_cover" placeholder="https://…" data-page-node-id="cvvtXOKIW8Qp6gP8Ov1VpS" /></div>
+        </div>
+      </div>
+
+      <div class="card-block" data-page-node-id="b4SFML4A6B4becGOUc1rp3">
+        <div class="cb-title" data-page-node-id="Tqx2nRdObPoOCVNac4Q9uN">② 双系统核心框架</div>
+        <div class="form-grid" data-page-node-id="DdRDC1hwsfVetGvpfqFbiy">
+          <div class="field" data-page-node-id="iaqcU1h5usayRGza3UREFu"><label data-page-node-id="gFjqyux0PSeCe9JExkK8Mq">系统1（快思考）— 描述</label><textarea id="f_s1desc" placeholder="自动、无需努力、随时在线"></textarea></div>
+          <div class="field" data-page-node-id="8hyZbkBACkl8EZXNfVoOvB"><label data-page-node-id="onhkBCNvRczJUwPQ8KdGeg">系统1 — 特征（每行一条）</label><textarea id="f_s1traits" placeholder="瞬间识别情绪、距离、熟悉的脸&#10;脱口而出 2+2"></textarea></div>
+          <div class="field" data-page-node-id="wDGKbwG2DoLIb7O4Yek8YM"><label data-page-node-id="AcKM2jLA2Me8oobhASFbbh">系统1 — 典型例子（每行一条）</label><textarea id="f_s1ex" placeholder="看到熟人立刻喊出名字"></textarea></div>
+          <div class="field" data-page-node-id="IsbfvSJchsFXNUbAixdJzx"><label data-page-node-id="W3vGMRteBwPpFKOHNgXFe7">系统2（慢思考）— 描述</label><textarea id="f_s2desc" placeholder="刻意、耗费精力、需要专注"></textarea></div>
+          <div class="field" data-page-node-id="guNToHnsDMhEnCZZJHTVVo"><label data-page-node-id="RAytohjcXPQYwGigFiYcX0">系统2 — 特征（每行一条）</label><textarea id="f_s2traits" placeholder="计算 17×24&#10;核查直觉、权衡证据"></textarea></div>
+          <div class="field" data-page-node-id="lvMHf8JwVrDmBNPJqfEoZ8"><label data-page-node-id="kb4ruqZmUPTo4h9QP46Ymt">系统2 — 典型例子（每行一条）</label><textarea id="f_s2ex" placeholder="填复杂税表"></textarea></div>
+          <div class="field" data-page-node-id="guqPRsK895u6p9Azlv0lpn"><label data-page-node-id="BbEU6lLu6idRO4tDY2QaF3">关键洞察（双系统小结）</label><textarea id="f_insight" placeholder="系统2常只是为系统1的直觉背书…"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card-block" data-page-node-id="7lcmaVEpec3wr0H8aH26gH">
+        <div class="cb-title" data-page-node-id="TMm9FYF2LL1nEX113jdlcl">③ 关键认知偏误卡片</div>
+        <div id="biasList" data-page-node-id="mC6Q6VWP1CdISg1JvUBDFa"></div>
+        <button class="add-btn" data-add="bias" data-page-node-id="CJ1vVTO69Oh3jlheL90vvR">+ 添加一条偏误</button>
+      </div>
+
+      <div class="card-block" data-page-node-id="GadWhZL9bd5Cifj85zfYaR">
+        <div class="cb-title" data-page-node-id="LRRqB2hh9L1hB1vZGOK8xC">④ 全书章节脉络</div>
+        <div id="chapterList" data-page-node-id="ojfQxudK1MbIWyEWUiZMJ1"></div>
+        <button class="add-btn" data-add="chapter" data-page-node-id="w2hCtTMeUAni3T0CTKJ2WY">+ 添加一部分</button>
+      </div>
+
+      <div class="card-block" data-page-node-id="gPJCgxdEcRHDRyUUMFydQ3">
+        <div class="cb-title" data-page-node-id="6geS1YlbQISHTBBCN0ORGj">⑤ 金句摘录</div>
+        <div id="quoteList" data-page-node-id="7J9dElb5yw87n5AsqHXojO"></div>
+        <button class="add-btn" data-add="quote" data-page-node-id="ddMOID48iQVJGecIaKPUP8">+ 添加一句金句</button>
+      </div>
+
+      <div class="card-block" data-page-node-id="S4XhS17TaGVcR1I3Vs9Vob">
+        <div class="cb-title" data-page-node-id="yGJnRpqBKjnF49Gnuz6BAl">⑥ 对工作和决策的行动启发</div>
+        <div id="actionList" data-page-node-id="LKiw1VPI27wKUilKFYuako"></div>
+        <button class="add-btn" data-add="action" data-page-node-id="VGl3yWbC5d0cpSS6pdB7qQ">+ 添加一条启发</button>
+      </div>
+
+      <div class="card-block" data-page-node-id="MqKeEcJ1kt7tFPmFjNsLOB">
+        <div class="cb-title" data-page-node-id="sXgtM7i0boWXZM7NYeqooH">⑦ 适合谁读</div>
+        <div id="audienceList" data-page-node-id="BxmvWr6LhgltcjIXCxCPYc"></div>
+        <button class="add-btn" data-add="audience" data-page-node-id="XvvnyuoTE6VcWVHSq6I6aY">+ 添加一类读者</button>
+      </div>
+
+      <div class="editor-actions" data-page-node-id="2saPcWPuKfuIqBsZsKADEU">
+        <button class="btn ghost" id="cancelEdit" data-page-node-id="A3KPuxJ2wusfxbUeDFqPGY">取消</button>
+        <button class="btn" id="saveDraft" data-page-node-id="yCrSPDtrHl1J2IEEG6n4cy">存为草稿</button>
+        <button class="btn primary" id="saveNote" data-page-node-id="Ke67ywJ3SU5pZR3nm2jh7J">保存并发布</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DATA / SHARING ============ -->
+  <section class="view" id="view-data" data-page-node-id="lqIATeekKiy5TVaNU1MkHQ">
+    <div class="wrap" style="max-width:880px;" data-page-node-id="cBEx4EAV0jue64KasGkG7d">
+      <h1 style="font-family:var(--serif);font-size:clamp(24px,4vw,32px);margin:0 0 4px;" data-page-node-id="lwuqxVBH58vZGJeklRhPA5">数据 / 团体共用</h1>
+      <p class="lib-sub" style="margin-bottom:18px;" data-page-node-id="1815WbnnCe0Vi7yVQxCAev">本地优先存储，可一键导出共享，也可接入 Supabase 实现团队实时同步。</p>
+
+      <div class="panel" data-page-node-id="7CEMFkCFwtHPLHtTSErneh">
+        <h3 data-page-node-id="ECcP9X3wk692pHmrAEXMWx">方式一 · 导出 / 导入 JSON（文件共享）</h3>
+        <p data-page-node-id="F1JYmF1oABOLGn2ArmON1R">把整本书库导出为一个 <code data-page-node-id="u8k1YXUdqeLGWDiLAbHyv9">.json</code> 文件，发给同事或存到共享网盘；对方「导入」即可合并到自己的书库。无需服务器，最稳妥的团体共用方式。</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;" data-page-node-id="A1VXfHQ2QizbPdevI3fvMe">
+          <button class="btn primary" id="exportBtn" data-page-node-id="fy8ilcnLeAi3DpG84HBWPC">⬇ 导出全部笔记</button>
+          <label class="btn" data-page-node-id="hQRCGEWTR4w5iAaPvVBMqJ">⬆ 导入笔记（合并）
+            <input type="file" id="importFile" accept=".json,application/json" style="display:none;" data-page-node-id="b6Fb6jMGuKv1BpDCgEGMWb" />
+          </label>
+        </div>
+      </div>
+
+      <div class="panel" data-page-node-id="vvJvsKZwBpsKXahlY6M6C9">
+        <h3 data-page-node-id="k03VxYvausFUDENexilavC">方式二 · Supabase 实时团队同步（可选）</h3>
+        <p data-page-node-id="O6w4UfyV6Dii5Xr3G0VBIB">若你们有 Supabase 项目，开启后所有成员访问同一张表即可实时共享书库。未配置时完全离线使用，不受影响。</p>
+        <ol class="steps" data-page-node-id="CfW0EEHpfbVaoH2RsEdPOB">
+          <li data-page-node-id="GdQm9sL2obWnl1Q277KRKd">新建 Supabase 项目 → 在 SQL 编辑器执行建表语句（见下方）。</li>
+          <li data-page-node-id="IiKoMHU3SVtssd4WTJ16v2">在 Project Settings 找到 <b data-page-node-id="Aid1ik7ticwPlASyUueCnO">Project URL</b> 与 <b data-page-node-id="d9GBXk1PRMGQK066Clkruv">anon public key</b>。</li>
+          <li data-page-node-id="v35kCgdzercQvkKGoTU2Eu">填入下方并「启用同步」，之后保存的笔记会自动上传 / 拉取。</li>
+        </ol>
+        <pre id="sqlHint" style="font-family:monospace;font-size:12px;background:#2c2519;color:#f1e9d6;padding:12px;border-radius:10px;overflow:auto;white-space:pre;" data-page-node-id="TkkCDrn4BpiCEDFD9HBnZF">CREATE TABLE reading_notes (
+  id text primary key,
+  payload jsonb not null,
+  updated_at timestamptz default now()
+);
+-- 建议开启 Row Level Security 并按团队邮箱授权</pre>
+        <div class="form-grid" style="margin-top:12px;" data-page-node-id="FmNb98eE6IKqVgeYMl602S">
+          <div class="field" data-page-node-id="klYMJUA2DSydBgA0hAIFlZ"><label data-page-node-id="4YX2RSRy5TVNGfnMfgKMhN">Supabase URL</label><input id="sb_url" placeholder="https://xxxx.supabase.co" data-page-node-id="cB3Acajtu9ZF7x0nFqPfoB" /></div>
+          <div class="field" data-page-node-id="zkjpt1zaHRfwEOJZguh9vc"><label data-page-node-id="JcUkNo7au3tHyZrYaBOlqG">Anon Key（公开）</label><input id="sb_key" placeholder="eyJhbGci…" data-page-node-id="bWVUo2CRy9CHzUXMZjjZDV" /></div>
+          <div class="field" data-page-node-id="GGyzdsuorMWx4UCoLdeT79"><label data-page-node-id="0JC4EAv3oLQHxhhVBSjDvE">表名</label><input id="sb_table" value="reading_notes" data-page-node-id="AZhGBymfmFmIV5FiIJZG7Q" /></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;" data-page-node-id="2JDs8rkSxDlfSgJcbFyrri">
+          <label class="switch" data-page-node-id="HFUuQGgFtFfHpgGP1HOAoa"><input type="checkbox" id="sb_enable" data-page-node-id="AcLLubp4G5aEXlfYPi2VPi" /> 启用 Supabase 同步</label>
+          <button class="btn" id="sb_pull" data-page-node-id="0ijZ6bzIeUEc10oEU70a8q">⬇ 立即从云端拉取</button>
+          <span id="sb_status" style="font-family:var(--sans);font-size:12px;color:var(--ink-faint);" data-page-node-id="PtFKuy0yNK2qGDPDSPSpra"></span>
+        </div>
+      </div>
+
+      <div class="panel" data-page-node-id="oY71fLFuXuqbPpE2sy7D4C">
+        <h3 data-page-node-id="wB06QN5gC5AKC3vyCLvD5L">存储说明</h3>
+        <p data-page-node-id="HCb7E0t7yEnEUg5RtzMF4V">当前书库保存于本机浏览器（localStorage 键 <code data-page-node-id="jVIpioGWH7Jnk1SEme5FLB">reading_notes_v1</code>）。换设备 / 清缓存会丢失，重要笔记请定期「导出」备份。</p>
+        <button class="btn" id="resetDemo" style="margin-top:6px;" data-page-node-id="cvu8akRviulwOfXDefazbq">恢复示例《思考，快与慢》</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== Data Layer ===================== */
+const LS_KEY = "reading_notes_v1";
+const SB_CFG = "reading_notes_sb_cfg";
+let NOTES = [];
+let editingId = null;
+
+function loadNotes(){
+  try{ NOTES = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+  catch(e){ NOTES = []; }
+  if(!Array.isArray(NOTES)) NOTES = [];
+}
+function saveNotes(){ localStorage.setItem(LS_KEY, JSON.stringify(NOTES)); }
+
+/* ---- Seed: 《思考，快与慢》 ---- */
+function seedNote(){
+  return {
+    id:"seed-thinking-fast-slow",
+    title:"《思考，快与慢》",
+    author:"丹尼尔·卡尼曼",
+    field:"认知心理学 / 行为经济学",
+    core:"直觉判断的系统性偏差",
+    oneliner:"我们的大脑里住着两个「我」：一个快、靠直觉，一个慢、靠推理。生活中大部分判断由「快」的那个做主——这既是高效，也是系统性犯错的根源。",
+    keywords:"双系统 · 偏误 · 决策",
+    theme:"认知科学, 行为经济学, 管理, 决策",
+    collab:"阿莫斯·特沃斯基",
+    contrib:"前景理论 (Prospect Theory)",
+    date:"2026-09-04",
+    color:"#a8442a",
+    cover:"",
+    s1desc:"自动、无需努力、随时在线",
+    s1traits:["瞬间识别情绪、距离、熟悉的脸","脱口而出 2+2，自动补全联想","省力高效，但容易被表象带偏"],
+    s1ex:["看到熟人立刻喊出名字","开车时一边聊天一边避让"],
+    s2desc:"刻意、耗费精力、需要专注",
+    s2traits:["计算 17×24、填写复杂表格","核查直觉、权衡证据、控制冲动","容量有限、容易疲惫，常「偷懒」"],
+    s2ex:["在会议上重新审视一个「显而易见」的结论"],
+    insight:"系统2自以为是主角，实际上大多数时候只是为系统1的直觉「背书」。真正的认知功夫，是在该慢的时候<strong>愿意</strong>慢下来，调动系统2去复核那个看似显而易见的答案。",
+    biases:[
+      {name:"锚定效应",en:"Anchoring Effect",desc:"第一个出现的数字会成为「锚」，悄悄拉着后续判断往它靠拢，哪怕这个数字毫无关联。",ex:"先看到标价 ¥1999 再打五折，比直接标 ¥999 更显划算。"},
+      {name:"可得性启发",en:"Availability Heuristic",desc:"越容易想起的事，越觉得它常发生。生动、近期、被反复报道的事件，会被高估概率。",ex:"看多了空难新闻，便高估坐飞机的风险。"},
+      {name:"损失厌恶",en:"Loss Aversion",desc:"失去 100 元的痛，约是得到 100 元快乐的两倍。我们为「不亏」付出的努力远超「赚到」。",ex:"明知该止损，却死守亏损的股票不肯卖。"},
+      {name:"框架效应",en:"Framing Effect",desc:"同一事实，换种说法就改变选择。数学上相同，感受却天差地别。",ex:"「95% 无脂」比「含 5% 脂肪」更好卖。"},
+      {name:"所见即全部",en:"WYSIATI",desc:"系统1只拿手头的信息下结论，对「我不知道什么」视而不见，于是过度自信。",ex:"只听一面之词，就笃定地判断对错。"},
+      {name:"回归平均的忽视",en:"Regression to the Mean",desc:"极端表现后往往回归常态，却被误解为「奖励有害、批评有效」等因果错觉。",ex:"骂过之后成绩回升，便以为骂管用。"}
+    ],
+    chapters:[
+      {part:"Ⅰ",title:"两个系统",note:"引入系统1与系统2，解释注意力、努力与「懒惰的控制者」如何分工。",desc:"地基 · 双系统模型"},
+      {part:"Ⅱ",title:"启发法与偏误",note:"锚定、可得性、代表性等心理捷径，为何高效却系统性地把我们带偏。",desc:"捷径 · 偏误来源"},
+      {part:"Ⅲ",title:"过度自信",note:"「所见即全部」、事后诸葛、对专家直觉的迷信，如何制造虚假的确定感。",desc:"认知 · 确定性幻觉"},
+      {part:"Ⅳ",title:"选择与风险",note:"前景理论登场：损失厌恶、参照点、框架效应如何重塑我们对得失的衡量。",desc:"决策 · 前景理论"},
+      {part:"Ⅴ",title:"两个自我",note:"「体验自我」与「记忆自我」的分裂——峰终定律揭示我们记住的并非真实的体验。",desc:"幸福 · 峰终定律"}
+    ],
+    quotes:[
+      {text:"没有什么比你以为自己已经理解的事，更容易让你犯错。",src:"论「所见即全部」与过度自信"},
+      {text:"我们对自己理解世界的能力，抱有近乎无限的盲目自信。",src:"论直觉的确定性幻觉"},
+      {text:"认识到自己正处在认知雷区，是放慢脚步、请系统2出场援助的第一步。",src:"全书方法论的核心"},
+      {text:"一个可靠的判断，往往来自一个安静、有序、可预测的环境。",src:"论专家直觉成立的条件"},
+      {text:"我们衡量的是变化与差异，而非绝对的状态本身。",src:"论参照点与前景理论"}
+    ],
+    actions:[
+      {t:"重大决策，强制「过夜」",d:"给系统2留出时间。重要选择不在情绪与第一直觉的高峰期拍板，隔一天再复核。"},
+      {t:"先独立写、再开会",d:"评审或评估前，让每个人先各自匿名记录判断，避免锚定与从众，再汇总讨论。"},
+      {t:"做「事前验尸」",d:"启动项目前先假设它已失败，倒推可能的原因，对冲过度乐观与「所见即全部」。"},
+      {t:"警惕被「框定」的选项",d:"遇到 A/B 选择，主动换种说法重述一遍——看看你的偏好会不会因措辞而翻转。"},
+      {t:"用基础比率校准直觉",d:"判断概率前先问「同类情况通常的发生率是多少」，别被生动的个例牵着走。"},
+      {t:"把损失厌恶摆上台面",d:"评估方案时分别列出「会失去什么」与「能得到什么」，避免因怕亏而错失更优解。"}
+    ],
+    audience:[
+      {t:"需要做判断与决策的人",d:"管理者、投资者、产品与运营——任何要在不确定中下注的角色。"},
+      {t:"想读懂「人为何非理性」的人",d:"行为经济学、营销、用户研究的入门与系统化读本。"},
+      {t:"追求自我认知升级的人",d:"愿意承认「我也会系统性犯错」，并想为此装上一套刹车的人。"}
+    ]
+  };
+}
+
+/* ===================== Helpers ===================== */
+const $ = (id)=>document.getElementById(id);
+const esc = (s)=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function lines(str){ return String(str||"").split(/\n+/).map(x=>x.trim()).filter(Boolean); }
+function uid(){ return "n_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function fmtDate(d){ return d?String(d):""; }
+
+/* ===================== View Routing ===================== */
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $("view-"+name).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  window.scrollTo(0,0);
+}
+
+/* ===================== Library Render ===================== */
+function renderLibrary(){
+  const q = $("searchInput").value.trim().toLowerCase();
+  const ft = $("filterTheme").value;
+  const fy = $("filterYear").value;
+  const sort = $("sortBy").value;
+
+  let list = NOTES.filter(n=>{
+    const hay = [n.title,n.author,n.field,n.core,n.keywords,n.theme,n.oneliner].join(" ").toLowerCase();
+    const okQ = !q || hay.includes(q);
+    const okT = !ft || (n.theme||"").split(/[,，]/).map(s=>s.trim()).includes(ft);
+    const okY = !fy || (n.date||"").slice(0,4)===fy;
+    return okQ && okT && okY;
+  });
+  list.sort((a,b)=>{
+    if(sort==="title") return (a.title||"").localeCompare(b.title||"");
+    if(sort==="date_asc") return (a.date||"").localeCompare(b.date||"");
+    return (b.date||"").localeCompare(a.date||"");
+  });
+
+  // populate filters
+  const themes = new Set(); const years = new Set();
+  NOTES.forEach(n=>{(n.theme||"").split(/[,，]/).map(s=>s.trim()).filter(Boolean).forEach(t=>themes.add(t)); (n.date||"").slice(0,4)&&years.add((n.date||"").slice(0,4));});
+  fillSelect($("filterTheme"),[...themes].sort(),"全部主题");
+  fillSelect($("filterYear"),[...years].sort((a,b)=>b-a),"全部年份");
+
+  const grid = $("bookGrid");
+  $("libCount").textContent = `共 ${list.length} 本`;
+  if(!list.length){ grid.innerHTML = `<div class="empty">还没有笔记。点右上角「写笔记」，或到「数据 / 共享」恢复示例。</div>`; return; }
+  grid.innerHTML = list.map(n=>{
+    const tags = (n.theme||"").split(/[,，]/).map(s=>s.trim()).filter(Boolean).slice(0,3)
+      .map(t=>`<span class="tag">${esc(t)}</span>`).join("");
+    return `<div class="book-card" data-id="${n.id}">
+      <div class="spine" style="background:${esc(n.color||"#a8442a")}"></div>
+      <div class="bc-body">
+        <div class="bc-title">${esc(n.title)}</div>
+        <div class="bc-author">${esc(n.author||"")}${n.field?" · "+esc(n.field):""}</div>
+        <div class="bc-oneliner">${esc(n.oneliner||"")}</div>
+        <div class="bc-meta">${n.date?`<span class="tag date">${esc(n.date)}</span>`:""}${tags}</div>
+      </div>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".book-card").forEach(c=>c.onclick=()=>openNote(c.dataset.id));
+}
+function fillSelect(sel,opts,allLabel){
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">${allLabel}</option>`+opts.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join("");
+  if(opts.includes(cur)) sel.value = cur;
+}
+
+/* ===================== Note Render ===================== */
+function openNote(id){
+  const n = NOTES.find(x=>x.id===id); if(!n) return;
+  const c = n.color||"#a8442a";
+  const cover = n.cover || "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80";
+  const root = $("noteRoot");
+  root.style.setProperty("--accent", c);
+  root.innerHTML = `
+    <div class="hero">
+      <div class="photo" style="background-image:url('${esc(cover)}')"></div>
+      <div class="mask"></div>
+      <div class="hero-inner">
+        <div class="eyebrow">读书笔记 · Reading Notes</div>
+        <h1>${esc(n.title)}</h1>
+        <div class="byline">${esc(n.author||"")}${n.field?"　·　"+esc(n.field):""}</div>
+        <div class="oneliner">${esc(n.oneliner||"")}</div>
+      </div>
+    </div>
+    <div class="note-body">
+      <div class="ribbon" style="--accent:${esc(c)}"></div>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">这本书讲了什么</h2><span class="sec-sub">书籍信息 · 一句话总览</span></div>
+        <div class="info-grid">
+          ${infoCell("作者",n.author)}
+          ${infoCell("领域",n.field)}
+          ${infoCell("核心命题",n.core)}
+          ${infoCell("关键词",n.keywords)}
+          ${infoCell("理论伙伴",n.collab)}
+          ${infoCell("代表贡献",n.contrib)}
+          ${n.oneliner?`<div class="info-cell full"><div class="k">一句话总览</div><div class="v" style="font-weight:500;line-height:1.7">${esc(n.oneliner)}</div></div>`:""}
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">核心框架：系统1 vs 系统2</h2><span class="sec-sub">全书的地基</span></div>
+        <div class="dual">
+          <div class="sys s1">
+            <div class="sys-tag">SYSTEM 1 · 快思考</div>
+            <h3>直觉系统</h3>
+            <div class="sys-quote">${esc(n.s1desc||"")}</div>
+            <ul>${lines(n.s1traits).map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+            ${lines(n.s1ex).length?`<div class="ex" style="margin-top:10px;font-size:13px;color:var(--ink-soft)">例：${lines(n.s1ex).map(esc).join("；")}</div>`:""}
+            <span class="badge">快 · 毫秒级 · 并行 · 无意识</span>
+          </div>
+          <div class="sys s2">
+            <div class="sys-tag">SYSTEM 2 · 慢思考</div>
+            <h3>理性系统</h3>
+            <div class="sys-quote">${esc(n.s2desc||"")}</div>
+            <ul>${lines(n.s2traits).map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+            ${lines(n.s2ex).length?`<div class="ex" style="margin-top:10px;font-size:13px;color:var(--ink-soft)">例：${lines(n.s2ex).map(esc).join("；")}</div>`:""}
+            <span class="badge">慢 · 秒级 · 串行 · 有意识</span>
+          </div>
+        </div>
+        ${n.insight?`<div class="insight"><b>关键洞察 —</b> ${n.insight}</div>`:""}
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">关键认知偏误卡片</h2><span class="sec-sub">系统1走捷径时常踩的坑</span></div>
+        <div class="bias-grid">
+          ${(n.biases||[]).map(b=>`<div class="bias">
+            <h4>${esc(b.name)}</h4><div class="en">${esc(b.en||"")}</div>
+            <p>${esc(b.desc||"")}</p>
+            ${b.ex?`<div class="ex"><b>例：</b>${esc(b.ex)}</div>`:""}
+          </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">全书脉络图</h2><span class="sec-sub">层层递进的知识地图</span></div>
+        <div class="timeline">
+          ${(n.chapters||[]).map(ch=>`<div class="tl-item" data-n="${esc(ch.part||"·")}">
+            <h4>${esc(ch.title)}</h4>
+            ${ch.desc?`<div class="tl-note">${esc(ch.desc)}</div>`:""}
+            <p>${esc(ch.note||"")}</p>
+          </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">金句摘录</h2><span class="sec-sub">值得抄进笔记本的句子</span></div>
+        ${(n.quotes||[]).map(q=>{
+          const parts = String(q.text||"").split(/[———-]{2,}/);
+          const body = parts[0]; const src = (q.src||parts[1]||"").trim();
+          return `<div class="quote"><div class="mark">“</div><div class="qt">${esc(body)}</div>${src?`<div class="src">—— ${esc(src)}</div>`:""}</div>`;
+        }).join("")}
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">对工作和决策的行动启发</h2><span class="sec-sub">把认知科学变成习惯</span></div>
+        <div class="acts">
+          ${(n.actions||[]).map(a=>`<div class="act"><div><h4>${esc(a.t||a)}</h4>${a.d?`<p>${esc(a.d)}</p>`:""}</div></div>`).join("")}
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">这本书适合谁读</h2><span class="sec-sub">如果你符合一条，就值得读</span></div>
+        <div class="aud-grid">
+          ${(n.audience||[]).map(a=>`<div class="aud"><h4>${esc(a.t||a)}</h4>${a.d?`<p>${esc(a.d)}</p>`:""}</div>`).join("")}
+        </div>
+      </section>
+
+      <div class="note-foot">
+        <span class="meta">${n.date?("记录于 "+esc(n.date)+"　"):""}${(n.theme||"").split(/[,，]/).map(s=>s.trim()).filter(Boolean).map(t=>`#${esc(t)}`).join(" ")}</span>
+        <button class="btn" onclick="editNote('${n.id}')">✎ 编辑</button>
+        <button class="btn ghost" onclick="deleteNote('${n.id}')">🗑 删除</button>
+        <button class="btn primary" onclick="showView('library')">← 返回书库</button>
+      </div>
+    </div>`;
+  showView("note");
+}
+function infoCell(k,v){
+  if(!v) return "";
+  return `<div class="info-cell"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div>`;
+}
+
+/* ===================== Editor ===================== */
+function editNote(id){
+  const n = NOTES.find(x=>x.id===id);
+  editingId = id;
+  $("importNote").style.display="none";
+  fillEditor(n||emptyNote());
+  showView("editor");
+}
+function emptyNote(){ return {id:null,biases:[{name:"",en:"",desc:"",ex:""}],chapters:[{part:"Ⅰ",title:"",desc:"",note:""}],quotes:[{text:"",src:""}],actions:[{t:"",d:""}],audience:[{t:"",d:""}]}; }
+
+function fillEditor(n){
+  $("f_title").value=n.title||""; $("f_author").value=n.author||""; $("f_field").value=n.field||"";
+  $("f_core").value=n.core||""; $("f_oneliner").value=n.oneliner||""; $("f_keywords").value=n.keywords||"";
+  $("f_theme").value=n.theme||""; $("f_collab").value=n.collab||""; $("f_contrib").value=n.contrib||"";
+  $("f_date").value=n.date||""; $("f_color").value=n.color||"#a8442a"; $("f_cover").value=n.cover||"";
+  $("f_s1desc").value=n.s1desc||""; $("f_s1traits").value=lines(n.s1traits).join("\n"); $("f_s1ex").value=lines(n.s1ex).join("\n");
+  $("f_s2desc").value=n.s2desc||""; $("f_s2traits").value=lines(n.s2traits).join("\n"); $("f_s2ex").value=lines(n.s2ex).join("\n");
+  $("f_insight").value=(n.insight||"").replace(/<[^>]+>/g,"");
+  renderDynamic("bias",n.biases); renderDynamic("chapter",n.chapters);
+  renderDynamic("quote",n.quotes); renderDynamic("action",n.actions); renderDynamic("audience",n.audience);
+}
+function collectEditor(){
+  const n = {
+    id: editingId || uid(),
+    title:$("f_title").value.trim(), author:$("f_author").value.trim(), field:$("f_field").value.trim(),
+    core:$("f_core").value.trim(), oneliner:$("f_oneliner").value.trim(), keywords:$("f_keywords").value.trim(),
+    theme:$("f_theme").value.trim(), collab:$("f_collab").value.trim(), contrib:$("f_contrib").value.trim(),
+    date:$("f_date").value, color:$("f_color").value, cover:$("f_cover").value.trim(),
+    s1desc:$("f_s1desc").value.trim(), s1traits:lines($("f_s1traits").value), s1ex:lines($("f_s1ex").value),
+    s2desc:$("f_s2desc").value.trim(), s2traits:lines($("f_s2traits").value), s2ex:lines($("f_s2ex").value),
+    insight:$("f_insight").value.trim(),
+    biases:collectList("bias",b=>({name:b.name,en:b.en,desc:b.desc,ex:b.ex}),x=>x.name),
+    chapters:collectList("chapter",c=>({part:c.part,title:c.title,desc:c.desc,note:c.note}),x=>x.title),
+    quotes:collectList("quote",q=>({text:q.text,src:q.src}),x=>x.text),
+    actions:collectList("action",a=>({t:a.t,d:a.d}),x=>x.t),
+    audience:collectList("audience",a=>({t:a.t,d:a.d}),x=>x.t)
+  };
+  return n;
+}
+function saveNote(draft){
+  const n = collectEditor();
+  if(!n.title){ alert("请至少填写书名"); return; }
+  const i = NOTES.findIndex(x=>x.id===n.id);
+  if(i>=0) NOTES[i]=n; else NOTES.push(n);
+  saveNotes();
+  if(SB.enabled) sbUpsert(n);
+  renderLibrary();
+  openNote(n.id);
+}
+
+/* ---- dynamic lists ---- */
+function renderDynamic(type, items){
+  const map = {
+    bias:(b)=>`<div class="dy-item" data-type="bias">
+        <button class="del" data-del>✕</button>
+        <div class="dy-row">
+          <div class="field"><label>名称</label><input data-k="name" value="${esc(b.name||"")}" placeholder="锚定效应"/></div>
+          <div class="field"><label>英文</label><input data-k="en" value="${esc(b.en||"")}" placeholder="Anchoring Effect"/></div>
+          <div class="field"><label>说明</label><textarea data-k="desc" placeholder="一句话解释">${esc(b.desc||"")}</textarea></div>
+          <div class="field"><label>例子</label><input data-k="ex" value="${esc(b.ex||"")}" placeholder="例：…"/></div>
+        </div></div>`,
+    chapter:(c)=>`<div class="dy-item" data-type="chapter">
+        <button class="del" data-del>✕</button>
+        <div class="dy-row">
+          <div class="field"><label>部分编号</label><input data-k="part" value="${esc(c.part||"")}" placeholder="Ⅰ"/></div>
+          <div class="field"><label>标题</label><input data-k="title" value="${esc(c.title||"")}" placeholder="两个系统"/></div>
+          <div class="field"><label>小标</label><input data-k="desc" value="${esc(c.desc||"")}" placeholder="地基 · 双系统模型"/></div>
+          <div class="field"><label>说明</label><textarea data-k="note" placeholder="本部分讲什么">${esc(c.note||"")}</textarea></div>
+        </div></div>`,
+    quote:(q)=>`<div class="dy-item" data-type="quote">
+        <button class="del" data-del>✕</button>
+        <div class="dy-row">
+          <div class="field"><label>金句</label><textarea data-k="text" placeholder="值得抄下的句子">${esc(q.text||"")}</textarea></div>
+          <div class="field"><label>出处 / 注解</label><input data-k="src" value="${esc(q.src||"")}" placeholder="—— 论…"/></div>
+        </div></div>`,
+    action:(a)=>`<div class="dy-item" data-type="action">
+        <button class="del" data-del>✕</button>
+        <div class="dy-row">
+          <div class="field"><label>标题</label><input data-k="t" value="${esc((a.t||a)||"")}" placeholder="重大决策，强制过夜"/></div>
+          <div class="field"><label>说明</label><textarea data-k="d" placeholder="具体怎么做">${esc(a.d||"")}</textarea></div>
+        </div></div>`,
+    audience:(a)=>`<div class="dy-item" data-type="audience">
+        <button class="del" data-del>✕</button>
+        <div class="dy-row">
+          <div class="field"><label>人群</label><input data-k="t" value="${esc((a.t||a)||"")}" placeholder="需要做判断与决策的人"/></div>
+          <div class="field"><label>说明</label><textarea data-k="d" placeholder="为什么适合">${esc(a.d||"")}</textarea></div>
+        </div></div>`
+  };
+  const cont = $(""+type+"List");
+  cont.innerHTML = (items&&items.length?items:[{}]).map(map[type]).join("");
+  bindDel(cont);
+}
+function bindDel(cont){
+  cont.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    b.closest(".dy-item").remove();
+    if(!cont.children.length) renderDynamic(cont.id.replace("List",""),[{}]);
+  });
+}
+function collectList(type, build, nonempty){
+  const cont = $(""+type+"List");
+  const out=[];
+  cont.querySelectorAll(".dy-item").forEach(it=>{
+    const o={}; it.querySelectorAll("[data-k]").forEach(el=>o[el.dataset.k]=el.value);
+    const obj=build(o);
+    if(nonempty(obj)) out.push(obj);
+  });
+  return out;
+}
+const emptyTemplates = {
+  bias:()=>({name:"",en:"",desc:"",ex:""}), chapter:()=>({part:"",title:"",desc:"",note:""}),
+  quote:()=>({text:"",src:""}), action:()=>({t:"",d:""}), audience:()=>({t:"",d:""})
+};
+
+/* ---- file import (txt / md / html / docx / pdf) ---- */
+function showImportStatus(msg,ok){
+  const el=$("importNote"); el.textContent=(ok?"✓ ":"… ")+msg; el.style.display="block";
+}
+function ensureScript(src,globalName){
+  return new Promise((resolve,reject)=>{
+    if(globalName && window[globalName]){ resolve(); return; }
+    const s=document.createElement("script");
+    s.src=src; s.onload=()=>resolve();
+    s.onerror=()=>reject(new Error("解析库加载失败，请检查网络后重试"));
+    document.head.appendChild(s);
+  });
+}
+async function extractDocx(buf){
+  await ensureScript("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js","mammoth");
+  const r = await window.mammoth.extractRawText({arrayBuffer:buf});
+  return r.value || "";
+}
+async function extractPdf(buf){
+  await ensureScript("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.js","pdfjsLib");
+  const pdfjsLib = window.pdfjsLib;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.js";
+  const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+  let text="";
+  for(let i=1;i<=pdf.numPages;i++){
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    text += tc.items.map(it=>it.str||"").join(" ") + "\n";
+  }
+  // 扫描版 PDF：文字层为空 → 自动 OCR
+  if(text.replace(/\s/g,"").length < 30){
+    showImportStatus("未检测到文字层，判定为扫描版，正在用 OCR 识别（首次需联网下载中文识别模型，请稍候）…");
+    text = await ocrPdf(pdf);
+  }
+  return text;
+}
+async function ocrPdf(pdf){
+  await ensureScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js","Tesseract");
+  showImportStatus("正在加载 OCR 引擎与中文识别模型（首次约需下载数十 MB，请保持联网）…");
+  const worker = await window.Tesseract.createWorker("chi_sim+eng",1,{
+    logger: m=>{ if(m.status==="recognizing text") showImportStatus("OCR 识别中："+Math.round(m.progress*100)+"%"); }
+  });
+  let out="";
+  const maxPages = Math.min(pdf.numPages, 20);
+  for(let i=1;i<=maxPages;i++){
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({scale:2});
+    const canvas = document.createElement("canvas");
+    canvas.width = viewport.width; canvas.height = viewport.height;
+    const ctx = canvas.getContext("2d");
+    await page.render({canvasContext:ctx, viewport}).promise;
+    const {data} = await worker.recognize(canvas);
+    out += data.text + "\n";
+    showImportStatus("OCR 第 "+i+"/"+maxPages+" 页完成");
+  }
+  await worker.terminate();
+  if(pdf.numPages > maxPages) out += "\n（已识别前 "+maxPages+" 页；全书 "+pdf.numPages+" 页。长篇扫描书建议在手机扫描软件里只导【重点章节】的少数页再上传，浏览器内 OCR 更快也更准。）";
+  return out;
+}
+function buildNoteFromText(text,filename){
+  const note = emptyNote();
+  let m = text.match(/^#\s+(.+)$/m) || text.match(/(?:书名|标题)[：:]\s*(.+)/);
+  note.title = (m?m[1]:(filename||"未命名").replace(/\.[^.]+$/,"")).trim().slice(0,80);
+  m = text.match(/(?:作者|著|撰)[：:]\s*(.+)/); if(m) note.author=m[1].trim().slice(0,40);
+  // chapters: markdown headings, 第X章, Chapter N, 或短编号标题
+  const chs=[]; const re=/^(?:#{1,3}\s+|第[0-9一二三四五六七八九十百]+章\s*|Chapter\s+\d+\s*|Section\s+\d+\s*[:：]?\s*)(.+)$/gim; let mm;
+  while((mm=re.exec(text))){ const t=mm[1].trim(); if(t.length<=40) chs.push({part:"",title:t,desc:"",note:""}); }
+  // 也兜底：数字编号的短标题行（如 "1. 双系统"）
+  if(!chs.length){ text.split(/\n+/).forEach(l=>{ const t=l.trim(); const k=t.match(/^\d+[\.、]\s+(.{2,30})$/); if(k) chs.push({part:"",title:k[1],desc:"",note:""}); }); }
+  if(chs.length) note.chapters=chs.slice(0,15);
+  // quotes: markdown 引用块，或含「」/“” 的短行
+  const qs=[]; text.split(/\n+/).forEach(l=>{
+    const t=l.trim();
+    if(/^>\s+/.test(t)) qs.push({text:t.replace(/^>\s+/,"").replace(/^["「]/,"").replace(/["」]$/,""),src:""});
+    else { const q=t.match(/[“"「](.+?)[”"」]/); if(q && t.length<160) qs.push({text:q[1],src:""}); }
+  });
+  if(qs.length) note.quotes=qs.slice(0,8);
+  note.date = new Date().toISOString().slice(0,10);
+  editingId=null;
+  fillEditor(note);
+  const msg=`已从《${note.title}》识别出书名、作者${chs.length?"、"+chs.length+"个章节":""}${qs.length?"、"+qs.length+"条金句":""}。请补全其余框架字段后保存。`;
+  showImportStatus(msg,true);
+  showView("editor");
+}
+function parseFile(file){
+  const reader = new FileReader();
+  const lower = (file.name||"").toLowerCase();
+  reader.onload = async ()=>{
+    try{
+      const buf = reader.result; let text;
+      if(lower.endsWith(".docx")){
+        showImportStatus("正在用 Mammoth 解析 Word 文档…");
+        text = await extractDocx(buf);
+      } else if(lower.endsWith(".pdf")){
+        showImportStatus("正在用 pdf.js 解析 PDF（可能需要联网加载解析库）…");
+        text = await extractPdf(buf);
+      } else {
+        text = new TextDecoder("utf-8").decode(buf);
+        if(/\.html?$/.test(lower)){ const d=document.createElement("div"); d.innerHTML=text; text=d.textContent||text; }
+      }
+      if(!text || !text.trim()){ showImportStatus("未能从文件中提取到文字，请确认文件未加密或为空。"); return; }
+      buildNoteFromText(text,file.name);
+    }catch(e){ showImportStatus("解析失败："+e.message,false); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ===================== Data / Sharing ===================== */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(NOTES,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="reading-notes-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+}
+function importJSON(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      const arr=Array.isArray(data)?data:(data.notes||[]);
+      let added=0;
+      arr.forEach(n=>{ if(n&&n.title){ if(!NOTES.find(x=>x.id===n.id)) NOTES.push(n); else { const i=NOTES.findIndex(x=>x.id===n.id); NOTES[i]=n;} added++; }});
+      saveNotes(); renderLibrary();
+      alert("已合并 "+added+" 本笔记到书库。");
+      showView("library");
+    }catch(e){ alert("导入失败：文件格式不正确。"); }
+  };
+  reader.readAsText(file,"utf-8");
+}
+
+/* ---- Supabase (optional) ---- */
+const SB = { client:null, enabled:false, url:"", key:"", table:"reading_notes" };
+function loadSBcfg(){
+  try{ const c=JSON.parse(localStorage.getItem(SB_CFG)); if(c){ SB.url=c.url;SB.key=c.key;SB.table=c.table||"reading_notes";SB.enabled=!!c.enabled;
+    $("sb_url").value=SB.url;$("sb_key").value=SB.key;$("sb_table").value=SB.table;$("sb_enable").checked=SB.enabled; } }catch(e){}
+}
+function saveSBcfg(){ localStorage.setItem(SB_CFG,JSON.stringify({url:SB.url,key:SB.key,table:SB.table,enabled:SB.enabled})); }
+function initSupabase(cb){
+  if(SB.client){ cb&&cb(); return; }
+  const s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  s.onload=()=>{ try{ SB.client=window.supabase.createClient(SB.url,SB.key); cb&&cb(); }catch(e){ $("sb_status").textContent="初始化失败："+e.message; } };
+  s.onerror=()=>{ $("sb_status").textContent="Supabase 脚本加载失败（需联网）。"; };
+  document.head.appendChild(s);
+}
+function sbUpsert(n){
+  if(!SB.client) return;
+  SB.client.from(SB.table).upsert({id:n.id,payload:n,updated_at:new Date().toISOString()})
+    .then(({error})=>{ if(error) $("sb_status").textContent="上传失败："+error.message; });
+}
+function sbPull(){
+  if(!SB.enabled||!SB.client){ $("sb_status").textContent="请先启用同步并保存配置。"; return; }
+  SB.client.from(SB.table).select("payload").then(({data,error})=>{
+    if(error){ $("sb_status").textContent="拉取失败："+error.message; return; }
+    let c=0; (data||[]).forEach(r=>{ const n=r.payload; if(n&&n.title){ const i=NOTES.findIndex(x=>x.id===n.id); if(i>=0)NOTES[i]=n;else NOTES.push(n); c++; }});
+    saveNotes(); renderLibrary(); $("sb_status").textContent="已拉取 "+c+" 条。";
+  });
+}
+
+/* ===================== Events ===================== */
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+  const v=b.dataset.view; if(v==="editor"){ editingId=null; fillEditor(emptyNote()); }
+  showView(v);
+});
+$("searchInput").addEventListener("input",renderLibrary);
+$("filterTheme").addEventListener("change",renderLibrary);
+$("filterYear").addEventListener("change",renderLibrary);
+$("sortBy").addEventListener("change",renderLibrary);
+$("cancelEdit").onclick=()=>showView("library");
+$("saveNote").onclick=()=>saveNote(false);
+$("saveDraft").onclick=()=>saveNote(true);
+document.querySelectorAll(".add-btn").forEach(b=>b.onclick=()=>{
+  const t=b.dataset.add; const cont=$(""+t+"List");
+  const tmp=document.createElement("div"); tmp.innerHTML=renderDynamicInner(t, emptyTemplates[t]());
+  cont.appendChild(tmp.firstElementChild); bindDel(cont);
+});
+function renderDynamicInner(type,item){
+  return {"bias":`<div class="dy-item" data-type="bias"><button class="del" data-del>✕</button><div class="dy-row">
+      <div class="field"><label>名称</label><input data-k="name" value="" placeholder="锚定效应"/></div>
+      <div class="field"><label>英文</label><input data-k="en" value="" placeholder="Anchoring Effect"/></div>
+      <div class="field"><label>说明</label><textarea data-k="desc" placeholder="一句话解释"></textarea></div>
+      <div class="field"><label>例子</label><input data-k="ex" value="" placeholder="例：…"/></div></div></div>`,
+    "chapter":`<div class="dy-item" data-type="chapter"><button class="del" data-del>✕</button><div class="dy-row">
+      <div class="field"><label>部分编号</label><input data-k="part" value="" placeholder="Ⅰ"/></div>
+      <div class="field"><label>标题</label><input data-k="title" value="" placeholder="两个系统"/></div>
+      <div class="field"><label>小标</label><input data-k="desc" value="" placeholder="地基"/></div>
+      <div class="field"><label>说明</label><textarea data-k="note" placeholder="本部分讲什么"></textarea></div></div></div>`,
+    "quote":`<div class="dy-item" data-type="quote"><button class="del" data-del>✕</button><div class="dy-row">
+      <div class="field"><label>金句</label><textarea data-k="text" placeholder="值得抄下的句子"></textarea></div>
+      <div class="field"><label>出处</label><input data-k="src" value="" placeholder="—— 论…"/></div></div></div>`,
+    "action":`<div class="dy-item" data-type="action"><button class="del" data-del>✕</button><div class="dy-row">
+      <div class="field"><label>标题</label><input data-k="t" value="" placeholder="重大决策，强制过夜"/></div>
+      <div class="field"><label>说明</label><textarea data-k="d" placeholder="具体怎么做"></textarea></div></div></div>`,
+    "audience":`<div class="dy-item" data-type="audience"><button class="del" data-del>✕</button><div class="dy-row">
+      <div class="field"><label>人群</label><input data-k="t" value="" placeholder="需要做判断与决策的人"/></div>
+      <div class="field"><label>说明</label><textarea data-k="d" placeholder="为什么适合"></textarea></div></div></div>`
+  }[type];
+}
+$("fileInput").addEventListener("change",e=>{ if(e.target.files[0]) parseFile(e.target.files[0]); e.target.value=""; });
+$("exportBtn").onclick=exportJSON;
+$("importFile").addEventListener("change",e=>{ if(e.target.files[0]) importJSON(e.target.files[0]); e.target.value=""; });
+$("resetDemo").onclick=()=>{ if(confirm("将《思考，快与慢》示例加入书库（已有时刷新内容）？")){ const s=seedNote(); const i=NOTES.findIndex(x=>x.id===s.id); if(i>=0)NOTES[i]=s;else NOTES.push(s); saveNotes(); renderLibrary(); alert("已恢复示例。"); } };
+
+$("sb_enable").addEventListener("change",()=>{
+  SB.enabled=$("sb_enable").checked; SB.url=$("sb_url").value.trim(); SB.key=$("sb_key").value.trim(); SB.table=$("sb_table").value.trim()||"reading_notes";
+  saveSBcfg();
+  if(SB.enabled){ if(!SB.url||!SB.key){ $("sb_status").textContent="请先填写 URL 与 Key。"; $("sb_enable").checked=false; SB.enabled=false; return; }
+    $("sb_status").textContent="连接中…"; initSupabase(()=>$("sb_status").textContent="已连接，保存即同步。"); }
+});
+$("sb_pull").onclick=sbPull;
+
+/* ===================== Boot ===================== */
+function boot(){
+  loadNotes(); loadSBcfg();
+  if(!NOTES.length){ NOTES.push(seedNote()); saveNotes(); }
+  renderLibrary();
+}
+window.editNote=editNote; window.deleteNote=function(id){ if(confirm("确定删除这本笔记？")){ NOTES=NOTES.filter(x=>x.id!==id); saveNotes(); renderLibrary(); showView("library"); } };
+window.showView=showView;
+boot();
+</script>
+</body>
+</html>
