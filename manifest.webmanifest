@@ -1,0 +1,15 @@
+{
+  "name": "读书笔记工作台",
+  "short_name": "读书笔记",
+  "description": "优雅的读书笔记工作台：书库检索、上传生成、团体共用。",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f1e9d6",
+  "theme_color": "#f1e9d6",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

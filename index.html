@@ -265,6 +265,11 @@
     .brand .label{display:none;}
   }
 </style>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#f1e9d6" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="读书笔记" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 </head>
 <body data-page-node-id="XUAuaN5cBk77kcVyROS6dR">
 <div class="app" data-page-node-id="DIu0AnQinPlfSlSK7j4S6v">
@@ -1037,6 +1042,11 @@ function boot(){
 window.editNote=editNote; window.deleteNote=function(id){ if(confirm("确定删除这本笔记？")){ NOTES=NOTES.filter(x=>x.id!==id); saveNotes(); renderLibrary(); showView("library"); } };
 window.showView=showView;
 boot();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){ navigator.serviceWorker.register('service-worker.js').catch(function(){}); });
+}
 </script>
 </body>
 </html>
